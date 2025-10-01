@@ -8,6 +8,10 @@ services:
     volumes:
       - ./form:/app
       - /app/node_modules
+    develop:
+      watch:
+        - path: ./form
+          action: rebuild
     depends_on:
       - backend
     networks:
@@ -20,6 +24,10 @@ services:
       - "5000:5000"
     volumes:
       - ./backend:/app
+    develop:
+      watch:
+        - path: ./backend
+          action: rebuild
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
     depends_on:
