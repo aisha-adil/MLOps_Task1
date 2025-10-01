@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  form:
+    build: ./form
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./form:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      custom_net:
+        ipv4_address: 172.25.0.10
+
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+    depends_on:
+      - db
+    networks:
+      custom_net:
+        ipv4_address: 172.25.0.11
+
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      custom_net:
+        ipv4_address: 172.25.0.12
+
+volumes:
+  pgdata:
+
+networks:
+  custom_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
